@@ -9,40 +9,35 @@ import { loadLastCity, saveLastCity } from "../utils/storage";
 
 import { darkTheme, lightTheme } from "../theme/theme";
 import type { AppTheme } from "../theme/theme";
-import ThemeToggle from "../components/ThemeToggle";
-import { loadThemeMode, saveThemeMode, type ThemeMode } from "../utils/themeStorage";
 
-import FavoritesBar from "../components/FavoritesBar";
-import { loadFavorites, saveFavorites } from "../utils/favoritesStorage";
+import ThemeToggle from "../components/ThemeToggle"; 
+import { loadThemeMode, saveThemeMode, type ThemeMode } from "../utils/themeStorage";
 
 export default function HomeScreen() {
 
     const [themeMode, setThemeMode] = useState<ThemeMode>("light");
     const theme = themeMode === "dark" ? darkTheme : lightTheme;
-    const s = makeStyles(theme);
-
+    const s = makeStyles(theme); 
+    
     const [loading, setLoading] = useState(false);
     const [city, setCity] = useState<string>("Bangkok");
     const [current, setCurrent] = useState<CurrentWeather | null>(null);
     const [forecast, setForecast] = useState<ForecastItem[]>([]);
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null); 
 
-    const [favorites, setFavorites] = useState<string[]>([]);
-
-
+    
     async function changeTheme(next: ThemeMode) {
         setThemeMode(next);
         await saveThemeMode(next);
     }
-
-
+    
     async function fetchAll(nextCity: string) {
         const trimmed = nextCity.trim();
         if (!trimmed) return;
-
+        
         setLoading(true);
         setError(null);
-
+        
         try {
             const [c, f] = await Promise.all([
                 getCurrentByCity(trimmed),
@@ -54,34 +49,15 @@ export default function HomeScreen() {
             await saveLastCity(trimmed);
         } catch (e: any) {
             const msg =
-                e?.response?.data?.message ||
-                e?.message ||
-                "Something went wrong. Please try again.";
+            e?.response?.data?.message ||
+            e?.message ||
+            "Something went wrong. Please try again.";
             setError(String(msg));
         } finally {
             setLoading(false);
         }
     }
-
-    async function addCurrentToFavorites() {
-        const c = city.trim();
-        if (!c) return;
-
-        const next = Array.from(new Set([c, ...favorites]));
-        setFavorites(next);
-        await saveFavorites(next);
-    }
-
-    async function removeFavorite(target: string) {
-        const next = favorites.filter((c) => c.toLowerCase() !== target.toLowerCase());
-        setFavorites(next);
-        await saveFavorites(next);
-    }
-
-    function isFavoriteCity() {
-        return favorites.some((c) => c.toLowerCase() === city.toLowerCase());
-    }
-
+    
     useEffect(() => {
         (async () => {
             const last = await loadLastCity();
@@ -91,7 +67,7 @@ export default function HomeScreen() {
         })();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
+    
     useEffect(() => {
         (async () => {
             const saved = await loadThemeMode();
@@ -99,25 +75,10 @@ export default function HomeScreen() {
         })();
     }, []);
 
-    useEffect(() => {
-        (async () => {
-            const fav = await loadFavorites();
-            setFavorites(fav);
-        })();
-    }, []);
-
-
     return (
         <ScrollView style={{ backgroundColor: theme.bg }} contentContainerStyle={s.container}>
             <Text style={s.h1}>Weather App</Text>
             <ThemeToggle theme={theme} mode={themeMode} onChange={changeTheme} />
-            <FavoritesBar
-                theme={theme}
-                cities={favorites}
-                currentCity={city}
-                onSelect={(c) => fetchAll(c)}
-                onRemove={(c) => removeFavorite(c)}
-            />
 
             <SearchBar
                 theme={theme}
@@ -133,15 +94,6 @@ export default function HomeScreen() {
                     onPress={() => fetchAll(city)}
                 >
                     <Text style={s.smallBtnText}>Refresh</Text>
-                </Pressable>
-                <Pressable
-                    style={[s.smallBtn, { marginLeft: 10 }, loading && s.btnDisabled]}
-                    disabled={loading}
-                    onPress={addCurrentToFavorites}
-                >
-                    <Text style={s.smallBtnText}>
-                        {isFavoriteCity() ? "★ Saved" : "☆ Save"}
-                    </Text>
                 </Pressable>
             </View>
 
@@ -169,7 +121,7 @@ const makeStyles = (theme: AppTheme) =>
         },
         h1: { fontSize: 28, fontWeight: "900", marginBottom: 6, color: theme.text },
 
-        actionsRow: { flexDirection: "row", justifyContent: "flex-end", gap: 10 },
+        actionsRow: { flexDirection: "row", justifyContent: "flex-end" },
         smallBtn: {
             borderWidth: 1,
             borderColor: theme.border,

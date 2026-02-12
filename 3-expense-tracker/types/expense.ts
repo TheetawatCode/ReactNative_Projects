@@ -1,7 +1,8 @@
 export type Expense = {
-    id: string;
-    title: string;
-    amount: number;
-    category: string;
-    type: "income" | "expense";
-  };
+  id: string;
+  title: string;
+  amount: number;
+  category: string;
+  type: "income" | "expense";
+  createdAt: string; // ISO string
+};

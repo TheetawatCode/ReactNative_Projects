@@ -1,3 +1,4 @@
+import ProductDetailScreen from "../screens/ProductDetailScreen";
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -6,13 +7,19 @@ import HomeScreen from "../screens/HomeScreen";
 import CartScreen from "../screens/CartScreen";
 import { Text } from "react-native";
 
+type RootStackParamList = {
+  Home: undefined;
+  ProductDetail: { productId: number };
+};
+
 const Tab = createBottomTabNavigator();
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function HomeStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Home" component={HomeScreen} options={{ title: "Shop" }} />
+      <Stack.Screen name="ProductDetail" component={ProductDetailScreen} options={{ title: "Detail" }} />
     </Stack.Navigator>
   );
 }

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "4-MiniECommerceApp",
-    "slug": "4-MiniECommerceApp",
+    "name": "4-mini-ecommerce-app",
+    "slug": "4-mini-ecommerce-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

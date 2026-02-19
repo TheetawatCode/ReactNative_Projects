@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import type { MenuItem } from "../data/menu";
+import { useCart } from "../store/useCart";
 import { useFavorites } from "../store/useFavorites";
 import { formatTHB } from "../utils/formatTHB";
 
@@ -12,6 +13,8 @@ type Props = {
 
 export default function MenuCard({ item, onPress }: Props) {
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
+
+  const { add } = useCart();
 
   const fav = useMemo(() => isFavorite(item.id), [isFavorite, item.id]);
 
@@ -57,10 +60,24 @@ export default function MenuCard({ item, onPress }: Props) {
 
         <View style={s.row}>
           <Text style={s.price}>{formatTHB(item.price)}</Text>
-          <View style={s.pill}>
-            <Text style={s.pillText}>{item.category}</Text>
+
+          <View style={s.rowRight}>
+            <View style={s.pill}>
+              <Text style={s.pillText}>{item.category}</Text>
+            </View>
+
+            <Pressable
+              onPress={() =>
+                add({ id: item.id, name: item.name, price: item.price, image: item.image })
+              }
+              style={({ pressed }) => [s.addBtn, pressed && { opacity: 0.9 }]}
+              hitSlop={10}
+            >
+              <Text style={s.addBtnText}>+ Add</Text>
+            </Pressable>
           </View>
         </View>
+
       </View>
     </Pressable>
   );
@@ -127,4 +144,15 @@ const s = StyleSheet.create({
     borderColor: "#e2e8f0",
   },
   pillText: { fontSize: 12, color: "#334155", fontWeight: "600" },
+
+  rowRight: { flexDirection: "row", alignItems: "center", gap: 8 },
+
+addBtn: {
+  paddingHorizontal: 12,
+  paddingVertical: 8,
+  borderRadius: 999,
+  backgroundColor: "#0f172a",
+},
+addBtnText: { color: "#ffffff", fontWeight: "800", fontSize: 12.5 },
+
 });

@@ -1,13 +1,17 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import React, { useMemo } from "react";
+import React, { useMemo, useRef } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Toast, type ToastHandle } from "../../components/Toast";
 import { MENU } from "../../data/menu";
 import { useCart } from "../../store/useCart";
 import { formatTHB } from "../../utils/formatTHB";
 
+
 export default function MenuDetailScreen() {
+  const toastRef = useRef<ToastHandle>(null);
+
   const router = useRouter();
   const params = useLocalSearchParams<{ id?: string | string[] }>();
 
@@ -21,7 +25,13 @@ export default function MenuDetailScreen() {
   const onAdd = () => {
     if (!item) return;
     add({ id: item.id, name: item.name, price: item.price, image: item.image });
+    toastRef.current?.show("Added ✓");
   };
+
+  const qty = useCart((s) => (id ? s.items[id]?.qty ?? 0 : 0));
+  const inc = useCart((s) => s.inc);
+  const dec = useCart((s) => s.dec);
+
 
   return (
     <SafeAreaView style={s.screen} edges={["top"]}>
@@ -76,18 +86,42 @@ export default function MenuDetailScreen() {
             <View style={s.row}>
               <Text style={s.price}>{formatTHB(item.price)}</Text>
 
-              <Pressable
-                onPress={onAdd}
-                hitSlop={10}
-                style={({ pressed }) => [s.addBtn, pressed && { opacity: 0.92 }]}
-              >
-                <Text style={s.addBtnText}>+ Add to cart</Text>
-              </Pressable>
+              {qty === 0 ? (
+                <Pressable
+                  onPress={onAdd}
+                  hitSlop={10}
+                  style={({ pressed }) => [s.addBtn, pressed && { opacity: 0.92 }]}
+                >
+                  <Text style={s.addBtnText}>+ Add to cart</Text>
+                </Pressable>
+              ) : (
+                <View style={s.qtyControl}>
+                  <Pressable
+                    onPress={() => dec(item.id)}
+                    hitSlop={10}
+                    style={({ pressed }) => [s.qtyBtn, pressed && { opacity: 0.85 }]}
+                  >
+                    <Ionicons name="remove" size={16} color="#0f172a" />
+                  </Pressable>
+
+                  <Text style={s.qtyText}>{qty}</Text>
+
+                  <Pressable
+                    onPress={() => inc(item.id)}
+                    hitSlop={10}
+                    style={({ pressed }) => [s.qtyBtn, pressed && { opacity: 0.85 }]}
+                  >
+                    <Ionicons name="add" size={16} color="#0f172a" />
+                  </Pressable>
+                </View>
+              )}
+
             </View>
 
           </View>
         </>
       )}
+      <Toast ref={toastRef} top={260} />
     </SafeAreaView>
   );
 }
@@ -139,4 +173,36 @@ const s = StyleSheet.create({
     backgroundColor: "#ffffff",
   },
   backBtnText: { fontWeight: "900", color: "#0f172a" },
+
+  qtyControl: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 16,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+  },
+
+  qtyBtn: {
+    width: 34,
+    height: 34,
+    borderRadius: 12,
+    backgroundColor: "#f1f5f9",
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  qtyText: {
+    minWidth: 20,
+    textAlign: "center",
+    fontWeight: "900",
+    color: "#0f172a",
+    fontSize: 16,
+  },
+
 });

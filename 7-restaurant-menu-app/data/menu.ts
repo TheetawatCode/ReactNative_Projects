@@ -70,6 +70,6 @@ export const MENU: MenuItem[] = [
     price: 99,
     category: "Drink",
     image:
-      "https://images.unsplash.com/photo-1626810309605-1d6a85e7375d?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1717439062391-1c2932e1c051?auto=format&fit=crop&w=1200&q=80",
   },
 ];

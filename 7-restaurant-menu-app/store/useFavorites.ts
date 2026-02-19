@@ -1,7 +1,8 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 
-type MenuItem = {
+type FavoriteItem = {
   id: string;
   name: string;
   price: number;
@@ -9,10 +10,11 @@ type MenuItem = {
 };
 
 type FavoritesState = {
-  favorites: MenuItem[];
-  addFavorite: (item: MenuItem) => void;
+  favorites: FavoriteItem[];
+  addFavorite: (item: FavoriteItem) => void;
   removeFavorite: (id: string) => void;
   isFavorite: (id: string) => boolean;
+  clearFavorites: () => void;
 };
 
 export const useFavorites = create<FavoritesState>()(
@@ -21,19 +23,24 @@ export const useFavorites = create<FavoritesState>()(
       favorites: [],
 
       addFavorite: (item) =>
-        set((state) => ({
-          favorites: [...state.favorites, item],
-        })),
+        set((state) => {
+          // กันซ้ำ
+          if (state.favorites.some((x) => x.id === item.id)) return state;
+          return { favorites: [item, ...state.favorites] };
+        }),
 
       removeFavorite: (id) =>
         set((state) => ({
-          favorites: state.favorites.filter((item) => item.id !== id),
+          favorites: state.favorites.filter((x) => x.id !== id),
         })),
 
-      isFavorite: (id) => get().favorites.some((item) => item.id === id),
+      isFavorite: (id) => get().favorites.some((x) => x.id === id),
+
+      clearFavorites: () => set({ favorites: [] }),
     }),
     {
       name: "favorites-storage",
+      storage: createJSONStorage(() => AsyncStorage), // ⭐ สำคัญมาก
     },
   ),
 );

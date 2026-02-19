@@ -61,7 +61,7 @@ export const MENU: MenuItem[] = [
     price: 119,
     category: "Drink",
     image:
-      "https://images.unsplash.com/photo-1542444459-db63c6f07b4a?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1515823064-d6e0c04616a7?auto=format&fit=crop&w=1200&q=80",
   },
   {
     id: "6",
@@ -70,6 +70,6 @@ export const MENU: MenuItem[] = [
     price: 99,
     category: "Drink",
     image:
-      "https://images.unsplash.com/photo-1528825871115-3581a5387919?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1626810309605-1d6a85e7375d?auto=format&fit=crop&w=1200&q=80",
   },
 ];

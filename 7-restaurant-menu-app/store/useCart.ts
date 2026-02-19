@@ -1,5 +1,6 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 export type CartItem = {
   id: string;
@@ -75,6 +76,9 @@ export const useCart = create<CartState>()(
       total: () =>
         Object.values(get().items).reduce((sum, x) => sum + x.price * x.qty, 0),
     }),
-    { name: "cart-storage" },
+    {
+      name: "cart-storage",
+      storage: createJSONStorage(() => AsyncStorage), // ⭐ สำคัญมาก
+    },
   ),
 );

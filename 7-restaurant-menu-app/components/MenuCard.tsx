@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useMemo } from "react";
+import React from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import type { MenuItem } from "../data/menu";
 import { useCart } from "../store/useCart";
@@ -12,11 +12,13 @@ type Props = {
 };
 
 export default function MenuCard({ item, onPress }: Props) {
-  const { addFavorite, removeFavorite, isFavorite } = useFavorites();
 
-  const { add } = useCart();
+  const fav = useFavorites((s) => s.favorites.some((x) => x.id === item.id));
+  const addFavorite = useFavorites((s) => s.addFavorite);
+  const removeFavorite = useFavorites((s) => s.removeFavorite);
 
-  const fav = useMemo(() => isFavorite(item.id), [isFavorite, item.id]);
+  const add = useCart((s) => s.add);
+
 
   const toggleFav = () => {
     if (fav) removeFavorite(item.id);
@@ -35,13 +37,21 @@ export default function MenuCard({ item, onPress }: Props) {
         <Image source={{ uri: item.image }} style={s.image} />
         <View style={s.overlay} />
 
-        <Pressable onPress={toggleFav} hitSlop={10} style={s.heartBtn}>
+        <Pressable
+          onPress={(e: any) => {
+            e?.stopPropagation?.();   // ⭐ ป้องกัน event ทะลุไปการ์ด
+            toggleFav();
+          }}
+          hitSlop={10}
+          style={s.heartBtn}
+        >
           <Ionicons
             name={fav ? "heart" : "heart-outline"}
             size={18}
             color={fav ? "#ef4444" : "#e2e8f0"}
           />
         </Pressable>
+
 
         {item.badge ? (
           <View style={s.badge}>
@@ -147,12 +157,12 @@ const s = StyleSheet.create({
 
   rowRight: { flexDirection: "row", alignItems: "center", gap: 8 },
 
-addBtn: {
-  paddingHorizontal: 12,
-  paddingVertical: 8,
-  borderRadius: 999,
-  backgroundColor: "#0f172a",
-},
-addBtnText: { color: "#ffffff", fontWeight: "800", fontSize: 12.5 },
+  addBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 999,
+    backgroundColor: "#0f172a",
+  },
+  addBtnText: { color: "#ffffff", fontWeight: "800", fontSize: 12.5 },
 
 });

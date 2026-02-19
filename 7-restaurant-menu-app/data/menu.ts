@@ -24,7 +24,7 @@ export const MENU: MenuItem[] = [
     category: "Recommended",
     badge: "Best seller",
     image:
-      "https://images.unsplash.com/photo-1521389508051-d7ffb5dc8bb1?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1643644598156-858b6d62405b?auto=format&fit=crop&w=1200&q=80",
   },
   {
     id: "2",

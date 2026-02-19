@@ -1,40 +1,56 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { useRouter } from "expo-router";
+import React, { useMemo } from "react";
+import { FlatList, StyleSheet, Text, View } from "react-native";
+import MenuCard from "../../components/MenuCard";
+import { MENU } from "../../data/menu";
+import { useFavorites } from "../../store/useFavorites";
 
-type MenuItem = {
-  id: string;
-  name: string;
-  price: number;
-  image?: string;
-};
+export default function FavoritesScreen() {
+  const router = useRouter();
+  const { favorites } = useFavorites();
 
-type FavoritesState = {
-  favorites: MenuItem[];
-  addFavorite: (item: MenuItem) => void;
-  removeFavorite: (id: string) => void;
-  isFavorite: (id: string) => boolean;
-};
+  const items = useMemo(() => {
+    // map favorites ids -> full MENU item (เพื่อให้ได้ description/category)
+    const set = new Set(favorites.map((f) => f.id));
+    return MENU.filter((m) => set.has(m.id));
+  }, [favorites]);
 
-export const useFavorites = create<FavoritesState>()(
-  persist(
-    (set, get) => ({
-      favorites: [],
+  return (
+    <View style={s.screen}>
+      <View style={s.header}>
+        <Text style={s.title}>Favorites</Text>
+        <Text style={s.subtitle}>Your saved picks</Text>
+      </View>
 
-      addFavorite: (item) =>
-        set((state) => ({
-          favorites: [...state.favorites, item],
-        })),
+      <FlatList
+        data={items}
+        keyExtractor={(x) => x.id}
+        numColumns={2}
+        columnWrapperStyle={{ gap: 12 }}
+        contentContainerStyle={s.list}
+        renderItem={({ item }) => (
+          <View style={{ flex: 1 }}>
+            <MenuCard item={item} onPress={() => router.push(`/menu/${item.id}`)} />
+          </View>
+        )}
+        ListEmptyComponent={
+          <View style={s.empty}>
+            <Text style={s.emptyTitle}>No favorites yet</Text>
+            <Text style={s.emptyText}>Tap the heart on any menu item.</Text>
+          </View>
+        }
+      />
+    </View>
+  );
+}
 
-      removeFavorite: (id) =>
-        set((state) => ({
-          favorites: state.favorites.filter((item) => item.id !== id),
-        })),
-
-      isFavorite: (id) =>
-        get().favorites.some((item) => item.id === id),
-    }),
-    {
-      name: "favorites-storage",
-    }
-  )
-);
+const s = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: "#f8fafc" },
+  header: { paddingTop: 14, paddingHorizontal: 16, paddingBottom: 10 },
+  title: { fontSize: 26, fontWeight: "800", color: "#0f172a" },
+  subtitle: { marginTop: 4, color: "#64748b" },
+  list: { paddingHorizontal: 16, paddingBottom: 18, gap: 12 },
+  empty: { padding: 20, alignItems: "center" },
+  emptyTitle: { fontSize: 16, fontWeight: "800", color: "#0f172a" },
+  emptyText: { marginTop: 6, color: "#64748b" },
+});
